@@ -72,9 +72,26 @@ const displayMenu =  () => {
 
 viewEmployees = () => {
 
-
-db.query( , function (err, results) {
-
+let employeeQuerry = `
+SELECT 
+employee.id AS employee_id,
+employee.first_name,
+employee.last_name,
+roles.title AS job_title,
+department.department_name AS department,
+roles.salary,
+CONCAT(manager.first_name, ' ', manager.last_name) AS manager
+FROM
+employee
+JOIN
+roles ON employee.role_id = roles.id
+JOIN
+department ON roles.department_id = department.id
+LEFT JOIN
+employee manager ON employee.manager_id = manager.id;`
+db.query(employeeQuerry, function (err, results) {
+    console.log(results);
+    displayMenu();
 });
 
 
@@ -92,7 +109,9 @@ db.query( , function (err, results) {
 
 updateEmployeeRole = () => {
 
+let updateEmployeeQuerry = `
 
+`
 db.query( , function (err, results) {
 
 });

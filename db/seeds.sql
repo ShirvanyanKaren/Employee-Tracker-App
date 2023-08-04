@@ -5,7 +5,7 @@ VALUES ("Sales"),
        ("Accounting");
       
 
-INSERT INTO role (title, salary, department_id)
+INSERT INTO roles (title, salary, department_id)
 VALUES ("Sales Lead", 100000, 1),
        ("Sales Person", 75000, 1),
        ("Financial Analyst", 100000, 2),
@@ -24,5 +24,5 @@ VALUES ("Michael","Scott", 1, null),
        ("Joe","Rogan", 6, 4),
        ("Robert","Patinson", 3, 2),
        ("Dwight","Shrute", 2, 1),
-       ("Natalie","Smith", 7, null),
+       ("Natalie","Smith", 7, null);
        
