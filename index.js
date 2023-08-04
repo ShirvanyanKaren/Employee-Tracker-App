@@ -1,6 +1,9 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 
+const roles = [];
+const departments = [];
+const employees = [];
 const db = mysql.createConnection(
     {
         host: 'localhost',
@@ -11,6 +14,27 @@ const db = mysql.createConnection(
     console.log('Connected to the employee database')
 
 );
+const init = () => {
+    departments = [];
+    roles = [];
+    employees = [];
+  
+    db.query("SELECT department_name FROM department", (err, data) => {
+      departments = data.map((element) => element.department_name);
+    });
+  
+    db.query("SELECT title FROM roles", (err, data) => {
+        roles = data.map((element) => element.role_name);
+    });
+  
+    db.query("SELECT last_name FROM employee", (err, data) => {
+        employees = data.map((element) => element.last_name);
+    });
+    db.query("SELECT first_name FROM employee", (err, data) => {
+        employees = data.map((element) => element.first_name);
+    });
+  };
+  
 
 const displayMenu =  () => {
     inquirer.prompt([
@@ -72,8 +96,8 @@ const displayMenu =  () => {
 
 viewEmployees = () => {
 
-let employeeQuerry = `
-SELECT 
+let employeesQue =
+`SELECT 
 employee.id AS employee_id,
 employee.first_name,
 employee.last_name,
@@ -89,7 +113,7 @@ JOIN
 department ON roles.department_id = department.id
 LEFT JOIN
 employee manager ON employee.manager_id = manager.id;`
-db.query(employeeQuerry, function (err, results) {
+db.query(employeesQue, function (err, results) {
     console.log(results);
     displayMenu();
 });
@@ -98,6 +122,35 @@ db.query(employeeQuerry, function (err, results) {
 };
 
 addEmployee = () => {
+inquirer.prompt ([
+    {
+        type: "input",
+        message: "What is the employee's first name?",
+        name: "first_name"
+    },
+    {
+        type: "input",
+        message: "What is the employee's last name?",
+        name: "last_name"
+    },
+    {
+        type: "input",
+        message: "What is the employee's first name?",
+        name: "first_name"
+    },
+    {
+        type: "list",
+        message: "What is their job title?",
+        name: "title",
+        choices: roles,
+    },
+    {
+        type: "list",
+        message: "What is their manager?",
+        name: "manager",
+        choices: employees,
+    },
+])
 
 
 db.query( , function (err, results) {
