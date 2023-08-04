@@ -1,4 +1,4 @@
-INSERT INTO department (depatment_name)
+INSERT INTO department (department_name)
 VALUES ("Sales"),
        ("Finance"),
        ("Software Engineering"),
@@ -25,4 +25,3 @@ VALUES ("Michael","Scott", 1, null),
        ("Robert","Patinson", 3, 2),
        ("Dwight","Shrute", 2, 1),
        ("Natalie","Smith", 7, null);
-       
