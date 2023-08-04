@@ -68,4 +68,94 @@ const displayMenu =  () => {
             return;
         }
     });
+};
+
+viewEmployees = () => {
+
+
+db.query( , function (err, results) {
+
+});
+
+
+};
+
+addEmployee = () => {
+
+
+db.query( , function (err, results) {
+
+});
+
+
+};
+
+updateEmployeeRole = () => {
+
+
+db.query( , function (err, results) {
+
+});
+
+
+};
+
+viewRoles = () => {
+
+
+db.query( , function (err, results) {
+
+});
+
+
+};
+
+addRole = () => {
+
+
+db.query( , function (err, results) {
+
+});
+
+
+};
+
+viewDepartments = () => {
+
+
+db.query( , function (err, results) {
+
+});
+
+
+};
+
+addDepartment = () => {
+
+
+db.query( , function (err, results) {
+
+});
+
+
+};
+
+removeEmployee = () => {
+
+
+db.query( , function (err, results) {
+
+});
+
+
+};
+
+removeRole = () => {
+
+
+db.query( , function (err, results) {
+
+});
+
+
 }
