@@ -1,6 +1,7 @@
+const chalk = require("chalk");
+const figlet = require("figlet");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-
 
 let roles = [];
 let departments = [];
@@ -16,6 +17,16 @@ const db = mysql.createConnection(
     console.log('Connected to the employee database')
 
 );
+
+console.log(chalk.blue.bold(`=============================================================================================================`));
+  console.log(``);
+  console.log(chalk.greenBright.bold(figlet.textSync('Employee Tracker App')));
+  console.log(``);
+  console.log(`                                                                                     ` + chalk.blueBright.bold('By: Karen Shirvanyan'));
+  console.log(``);
+  console.log(chalk.blue.bold(`=============================================================================================================`));
+
+
 
 
 const init = () => {
@@ -54,6 +65,7 @@ const displayMenu = () => {
                 "Add Department",
                 "Remove Employee",
                 "Remove Role",
+                "Remove Department",
                 "Exit"
             ],
 
@@ -89,9 +101,12 @@ const displayMenu = () => {
                 case "Remove Role":
                     removeRole();
                     break;
+                case "Remove Department":
+                    removeDepartment();
+                    break;
                 case "Exit":
                     console.log("Thank you for using our program!");
-                    return;
+                    process.exit();
             }
         });
 };
@@ -254,7 +269,7 @@ const addRole = () => {
 
 
 
-updateEmployeeRole = () => {
+const updateEmployeeRole = () => {
     inquirer.prompt([
         {
             type: "list",
@@ -321,30 +336,111 @@ const addDepartment = () => {
             } else {
                 console.log("Department added successfully!");
             }
+            displayMenu()
          });
         });
     };
 
 
-// removeEmployee = () => {
+const removeEmployee = () => {
+    inquirer.prompt([
+        {
+            type: "list",
+            message: "Which employee would you like to remove?",
+            name: "employee",
+            choices: employees,
+        }
+    ])
+    .then((response) => {
+        const { employee } = response;
 
 
-// db.query( , function (err, results) {
+        const employee_id = employees.findIndex((emp) => emp === employee) + 1; 
+ 
 
-// });
+        const removeEmpQue = `
+        DELETE FROM employee
+        WHERE employee.id = ?
+        `;
+
+        db.query(removeEmpQue, [employee_id], (err, result) => {
+            if (err) {
+                console.error("Error removing the employee:", err);
+            } else {
+                console.log("Employee removed successfully!");
+            }
+            displayMenu();
+        });
+    })
 
 
-// };
 
-// removeRole = () => {
+};
+
+const removeRole = () => {
+    inquirer.prompt([
+        {
+            type: "list",
+            message: "Which role would you like to remove?",
+            name: "title",
+            choices: roles,
+        }
+    ])
+    .then((response) => {
+        const { title } = response;
+
+        const roles_id = roles.findIndex((role) => role === title) + 1; 
+ 
+
+        const removeRoleQue = `
+        DELETE FROM roles
+        WHERE roles.id = ?
+        `;
+
+        db.query(removeRoleQue, [roles_id], (err, result) => {
+            if (err) {
+                console.error("Error removing the role:", err);
+            } else {
+                console.log("Role removed successfully!");
+            }
+            displayMenu();
+        });
+    })
+};
+
+const removeDepartment = () => {
+    inquirer.prompt([
+        {
+            type: "list",
+            message: "Which employee would you like to remove?",
+            name: "department",
+            choices: departments,
+        }
+    ])
+    .then((response) => {
+        const { department } = response;
+
+        const department_id = departments.findIndex((dept) => dept === department) + 1; 
+ 
+
+        const removeDepQue = `
+        DELETE FROM department
+        WHERE department.id = ?
+        `;
+
+        db.query(removeDepQue, [department_id], (err, result) => {
+            if (err) {
+                console.error("Error removing the department:", err);
+            } else {
+                console.log("Department removed successfully!");
+            }
+            displayMenu();
+        });
+    });
+
+};
 
 
-// db.query( , function (err, results) {
-
-// });
-
-
-// }
 init();
 displayMenu();
 
