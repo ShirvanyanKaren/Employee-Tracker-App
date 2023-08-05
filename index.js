@@ -1,9 +1,11 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
+const none = [null];
 
 let roles = [];
 let departments = [];
 let employees = [];
+
 const db = mysql.createConnection(
     {
         host: 'localhost',
@@ -12,7 +14,7 @@ const db = mysql.createConnection(
         database: 'employee_db'
     },
     console.log('Connected to the employee database')
-   
+
 );
 
 
@@ -22,23 +24,23 @@ const init = () => {
     departments = [];
     roles = [];
     employees = [];
-  
+
     db.query("SELECT department_name FROM department", (err, data) => {
-      departments = data.map((element) => element.department_name);
+        departments = data.map((element) => element.department_name);
     });
-  
+
     db.query("SELECT title FROM roles", (err, data) => {
         roles = data.map((element) => element.title);
     });
-  
+
     db.query("SELECT last_name FROM employee", (err, data) => {
         employees = data.map((element) => element.last_name);
     });
 
-  };
-  
+};
 
-const displayMenu =  () => {
+
+const displayMenu = () => {
     inquirer.prompt([
         {
             type: "list",
@@ -59,47 +61,47 @@ const displayMenu =  () => {
 
         }
     ])
-    .then((answers) => {
-        choice = answers.choice;
-        switch (choice) {
-          case "View All Employees":
-            viewEmployees();
-            break;
-          case "Add Employee":
-            addEmployee();
-            break;
-          case "Update Employee Role":
-            updateEmployeeRole();
-            break;
-          case "View All Roles":
-            viewRoles();
-            break;
-          case "Add Role":
-            addRole();
-            break;
-          case "View All departments":
-            viewDepartments();
-            break;
-          case "Add Department":
-            addDepartment();
-            break;
-          case "Remove Employee":
-            removeEmployee();
-            break;
-          case "Remove Role":
-            removeRole();
-            break;
-          case "Exit":
-            console.log("Thank you for using our program!");
-            return;
-        }
-    });
+        .then((answers) => {
+            choice = answers.choice;
+            switch (choice) {
+                case "View All Employees":
+                    viewEmployees();
+                    break;
+                case "Add Employee":
+                    addEmployee();
+                    break;
+                case "Update Employee Role":
+                    updateEmployeeRole();
+                    break;
+                case "View All Roles":
+                    viewRoles();
+                    break;
+                case "Add Role":
+                    addRole();
+                    break;
+                case "View All departments":
+                    viewDepartments();
+                    break;
+                case "Add Department":
+                    addDepartment();
+                    break;
+                case "Remove Employee":
+                    removeEmployee();
+                    break;
+                case "Remove Role":
+                    removeRole();
+                    break;
+                case "Exit":
+                    console.log("Thank you for using our program!");
+                    return;
+            }
+        });
 };
 
 const viewEmployees = () => {
 
-let employeesQue =
-`SELECT 
+    let employeesQue =
+        `SELECT 
 employee.id AS employee_id,
 employee.first_name,
 employee.last_name,
@@ -115,22 +117,22 @@ JOIN
 department ON roles.department_id = department.id
 LEFT JOIN
 employee manager ON employee.manager_id = manager.id;`
-db.query(employeesQue, function (err, results) {
-    console.table(results);
-    displayMenu();
+    db.query(employeesQue, function (err, results) {
+        console.table(results);
+        displayMenu();
 
-});
+    });
 };
 
 const viewDepartments = () => {
     let viewDepQue = `SELECT * FROM department;`
-    
-    db.query( viewDepQue, function (err, results) {
+
+    db.query(viewDepQue, function (err, results) {
         console.table(results);
         displayMenu();
     });
-    
-    };
+
+};
 
 
 
@@ -138,103 +140,172 @@ const viewDepartments = () => {
 
 const viewRoles = () => {
     let viewRolesQue =
-    `SELECT roles.title,
+        `SELECT roles.title,
     roles.id, 
     roles.salary,
     department.department_name
     FROM department
     JOIN roles ON roles.department_id = department.id;
     `
-    
-    db.query( viewRolesQue, function (err, results) {
+
+    db.query(viewRolesQue, function (err, results) {
         console.table(results);
         displayMenu();
     });
-    
-    
-    };
 
-    const addEmployee = () => {
-        inquirer.prompt([
-          {
+
+};
+
+const addEmployee = () => {
+    inquirer.prompt([
+        {
             type: "input",
             message: "What is the employee's first name?",
             name: "first_name",
-          },
-          {
+        },
+        {
             type: "input",
             message: "What is the employee's last name?",
             name: "last_name",
-          },
-          {
+        },
+        {
             type: "list",
             message: "What is their job title?",
             name: "title",
             choices: roles,
-          },
-          {
+        },
+        {
             type: "list",
-            message: "What is their manager?",
+            message: "Who is their manager?",
             name: "manager",
-            choices: employees,
-          },
-        ])
+            choices: employees, none,
+        },
+    ])
         .then((response) => {
-          const { first_name, last_name, title, manager } = response;
-      
+            const { first_name, last_name, title, manager } = response;
 
-          const role_id = roles.findIndex((role) => role === title) + 1;
-          const manager_id = employees.findIndex((employee) => employee === manager) + 1;
-      
-       
-          const employeeQue = `
+
+            const role_id = roles.findIndex((role) => role === title) + 1;
+            const manager_id = employees.findIndex((employee) => employee === manager) + 1;
+
+
+            const employeeQue = `
             INSERT INTO employee (first_name, last_name, role_id, manager_id)
             VALUES (?, ?, ?, ?)
           `;
-      
-          db.query(employeeQue, [first_name, last_name, role_id, manager_id], (err, result) => {
-            if (err) {
-              console.error("Error adding the employee:", err);
-            } else {
-              console.log("Employee added successfully!");
-            }
-          
-            displayMenu();
-          });
+
+            db.query(employeeQue, [first_name, last_name, role_id, manager_id], (err, result) => {
+                if (err) {
+                    console.error("Error adding the employee:", err);
+                } else {
+                    console.log("Employee added successfully!");
+                }
+
+                displayMenu();
+            });
         });
-      };
-      
+};
 
 
-// db.query( , function (err, results) {
-
-// });
 
 
-// };
+const addRole = () => {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the name of the Role?",
+            name: "title",
+        },
+        {
+            type: "input",
+            message: "What is the salary of the Role?",
+            name: "salary",
+        },
+        {
+            type: "list",
+            message: "Which department does the role belong to?",
+            name: "department",
+            choices: departments,
+        },
 
-// updateEmployeeRole = () => {
+    ])
+        .then((response) => {
+            const { title, salary, department } = response;
 
-// let updateEmployeeQuerry = `
+            const department_id = departments.findIndex((dept) => dept === department) + 1;
 
-// `
-// db.query( , function (err, results) {
+            const addRoleQue = `
+            INSERT INTO roles (title, salary, department_id)
+            VALUES (?, ?, ?)
+            `;
 
-// });
+            db.query( addRoleQue, [title, salary, department_id], (err, results) => {
+                if (err) {
+                    console.error("Error adding the role:", err);
+                } else {
+                    console.log("Role added successfully!");
+                }
+                displayMenu();
+            });
+
+            });
+
+        };
 
 
-// };
 
 
-// addRole = () => {
+
+updateEmployeeRole = () => {
+    inquirer.prompt([
+        {
+            type: "list",
+            message: "Which employees role would you like to update?",
+            name: "employee",
+            choices: employees,
+        },
+        {
+            type: "list",
+            message: "Which role would you like to assign to this employee?",
+            name: "title",
+            choices: roles,
+        },
+        {
+            type: "list",
+            message: "Who is their manager?",
+            name: "manager",
+            choices: employees, none,
+        },
+
+    ])
+    .then((response)=> {
+        const { employee, title, manager } = response;
+        const role_id = roles.findIndex((role) => role === title) + 1;
+        const manager_id = employees.findIndex((employee) => employee === manager) + 1;
+
+        const updateEmployeeQue = `
+        UPDATE employee SET (role_id, manager_id)
+        VALUES (?, ?)
+        `;
+
+        db.querry(updateEmployeeQue, [role_id, manager_id], (err, result) => {
+            
 
 
-// db.query( , function (err, results) {
-
-// });
+        });
 
 
-// };
+
+
+
+
+
+    });
+
+
+
+
+};
 
 
 
