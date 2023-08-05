@@ -1,6 +1,6 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-const none = [null];
+
 
 let roles = [];
 let departments = [];
@@ -16,8 +16,6 @@ const db = mysql.createConnection(
     console.log('Connected to the employee database')
 
 );
-
-
 
 
 const init = () => {
@@ -274,7 +272,7 @@ updateEmployeeRole = () => {
             type: "list",
             message: "Who is their manager?",
             name: "manager",
-            choices: employees, none,
+            choices: employees,
         },
 
     ])
@@ -284,40 +282,49 @@ updateEmployeeRole = () => {
         const manager_id = employees.findIndex((employee) => employee === manager) + 1;
 
         const updateEmployeeQue = `
-        UPDATE employee SET (role_id, manager_id)
-        VALUES (?, ?)
+        UPDATE employee
+        SET role_id = ?, manager_id = ?
+        WHERE last_name = ?;
         `;
 
-        db.querry(updateEmployeeQue, [role_id, manager_id], (err, result) => {
-            
-
-
+        db.query(updateEmployeeQue, [role_id, manager_id, employee], (err, result) => { 
+            if (err) {
+                console.error("Error updating the employee:", err);
+            } else {
+                console.log("Employee updated successfully!");
+            }
+            displayMenu();
         });
-
-
-
-
-
-
-
     });
-
-
-
-
 };
 
 
 
-// addDepartment = () => {
+const addDepartment = () => {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What Department would you like to add?",
+            name: "department",
+        },
+    ])
+    .then((response) => {
+        const { department } = response;
 
+        const addDepQue = `
+        INSERT INTO department (department_name)
+        VALUES (?)
+        `;
+        db.query( addDepQue, [department], (err, results) =>{
+            if(err){
+                console.error("Error adding the department:", err);
+            } else {
+                console.log("Department added successfully!");
+            }
+         });
+        });
+    };
 
-// db.query( , function (err, results) {
-
-// });
-
-
-// };
 
 // removeEmployee = () => {
 
@@ -341,4 +348,3 @@ updateEmployeeRole = () => {
 init();
 displayMenu();
 
-// viewEmployees();
