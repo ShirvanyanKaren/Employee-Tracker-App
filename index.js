@@ -191,7 +191,7 @@ const addEmployee = () => {
             type: "list",
             message: "Who is their manager?",
             name: "manager",
-            choices: employees, none,
+            choices: employees,
         },
     ])
         .then((response) => {
@@ -213,7 +213,7 @@ const addEmployee = () => {
                 } else {
                     console.log("Employee added successfully!");
                 }
-
+                init();
                 displayMenu();
             });
         });
@@ -258,6 +258,7 @@ const addRole = () => {
                 } else {
                     console.log("Role added successfully!");
                 }
+                init();
                 displayMenu();
             });
 
@@ -308,6 +309,7 @@ const updateEmployeeRole = () => {
             } else {
                 console.log("Employee updated successfully!");
             }
+            init();
             displayMenu();
         });
     });
@@ -336,6 +338,7 @@ const addDepartment = () => {
             } else {
                 console.log("Department added successfully!");
             }
+            init();
             displayMenu()
          });
         });
@@ -369,6 +372,7 @@ const removeEmployee = () => {
             } else {
                 console.log("Employee removed successfully!");
             }
+            init();
             displayMenu();
         });
     })
@@ -403,6 +407,7 @@ const removeRole = () => {
             } else {
                 console.log("Role removed successfully!");
             }
+            init();
             displayMenu();
         });
     })
@@ -434,7 +439,9 @@ const removeDepartment = () => {
             } else {
                 console.log("Department removed successfully!");
             }
+            init();
             displayMenu();
+
         });
     });
 
