@@ -3,139 +3,201 @@
 ## Technology used
 | Technology Used         | Resource URL           | 
 | ------------- |:-------------:| 
-| Deployed Heroku App  | [https://note-taker-app-shirvanyank-f32586d10362.herokuapp.com/](https://note-taker-app-shirvanyank-f32586d10362.herokuapp.com/) |
-| My Repository      | [https://github.com/ShirvanyanKaren/notetaker-application](https://github.com/ShirvanyanKaren/notetaker-application) |
+| Deployed Video  | [https://drive.google.com/file/d/1NSvNjPHJcDH1mmXqFJEZpC8IawIUmF60/view](https://drive.google.com/file/d/1NSvNjPHJcDH1mmXqFJEZpC8IawIUmF60/view) |
+| My Repository      | [https://github.com/ShirvanyanKaren/Employee-Tracker-App](https://github.com/ShirvanyanKaren/Employee-Tracker-App) |
 | Node JS          | [https://nodejs.org/it/docs](https://nodejs.org/it/docs) |
-| Express JS    | [https://expressjs.com/en/guide/routing.html](https://expressjs.com/en/guide/routing.html) |
+| MySQL          | [https://dev.mysql.com/doc/](https://dev.mysql.com/doc/) |
+| MySQL2 NPM  | [https://www.npmjs.com/package/mysql2#using-prepared-statements](hhttps://www.npmjs.com/package/mysql2#using-prepared-statements) |
 | Git | [https://git-scm.com/](https://git-scm.com/)     | 
 
 
 
 # Description
 
-The purpose of this application is to allow the user to add notes and save them to a list. The list is present in a column on the left-hand side of the page, making each saved note accessible to the user. 
+The purpose of this application is to allow the user to access a company database to perform actions such as add, manage, and view departments, roles, and employees. 
 
 The application had to meet the following acceptance criteria:
 
 ```md
-GIVEN a note-taking application
-WHEN I open the Note Taker
-THEN I am presented with a landing page with a link to a notes page
-WHEN I click on the link to the notes page
-THEN I am presented with a page with existing notes listed in the left-hand column, plus empty fields to enter a new note title and the note’s text in the right-hand column
-WHEN I enter a new note title and the note’s text
-THEN a Save icon appears in the navigation at the top of the page
-WHEN I click on the Save icon
-THEN the new note I have entered is saved and appears in the left-hand column with the other existing notes
-WHEN I click on an existing note in the list in the left-hand column
-THEN that note appears in the right-hand column
-WHEN I click on the Write icon in the navigation at the top of the page
-THEN I am presented with empty fields to enter a new note title and the note’s text in the right-hand column
+GIVEN a command-line application that accepts user input
+WHEN I start the application
+THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+WHEN I choose to view all departments
+THEN I am presented with a formatted table showing department names and department ids
+WHEN I choose to view all roles
+THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
+WHEN I choose to view all employees
+THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
+WHEN I choose to add a department
+THEN I am prompted to enter the name of the department and that department is added to the database
+WHEN I choose to add a role
+THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
+WHEN I choose to add an employee
+THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
+WHEN I choose to update an employee role
+THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
 ```
 
 Here is an example of how the application runs:
 
-![Notetaker-App](./Assets/notetaker%20application,%202023%206_20%20PM.gif)
+![Employee-Tracker-App](./Assets/EmpTrack.gif)
 
 
 ## Table of Contents
-* [Express JS Routing](#express-js-routing)
+* [MySQL and Node JS](#mysql-and-node-js)
 * [Usage](#usage)
-* [Contributions](#contributions)
 * [License](#license)
 * [Questions](#questions) 
 
 
-## Express JS Routing
-
-The note taker application was developed with preset code of fetch requests with get, post and delete methods for obtaining information on the client side. The input data is then stored on the back-end database JSON file using corresponding express js routing methods made accessible to the home page and the notes page.
+## MySQL and Node JS
 
 
-### Server file 
+The employee tracker application was made from scratch with the inquirer and mysql2 npm packages as well as mysql to initialize the database. The mysql2 extenstion was used to create a connection between the initiated sql database and the local index.js file.
 
-The server.js file served as the medium to deliver the routes to the user. This was done through the importing the methods express, path, and index routes that provided all the preset routing methods for the notes page.
+### MySQL initialization
 
-```js
-// middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use('/api', api);
-app.use(express.static('public'));
+The database has to first be initialized through the MySQL schema and seed files. This allows a structure and initial values to the table.
 
-// request and response leading to each page
-app.get('/notes', (req, res) => 
-    res.sendFile(path.join(__dirname, '/public/notes.html'))
+```sql
+CREATE TABLE department (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(30) NOT NULL
 );
 
-app.get('*', (req, res) => 
-    res.sendFile(path.join(__dirname, '/public/index.html'))
+
+CREATE TABLE roles (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(30),
+    salary DECIMAL,
+    department_id INT NOT NULL,
+    FOREIGN KEY (department_id)
+    REFERENCES department(id)
+    ON DELETE CASCADE
+);
+
+
+CREATE TABLE employee (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(30),
+    last_name VARCHAR(30),
+    role_id INT NOT NULL,
+    FOREIGN KEY (role_id)
+    REFERENCES roles(id)
+    ON DELETE CASCADE,
+    manager_id INT,
+    FOREIGN KEY (manager_id)
+    REFERENCES employee(id)
+    ON DELETE CASCADE
 );
 ```
-The middleware present with the app.use methods sets an intermediary for the programs request, response cycle. The lines of middleware code respectively parse incoming json data, parses incoming URL-encoded data, mounts the exported api router onto the '/api' path, and allows client side access to the files stored in the public directory (the home and notes html pages).
+The tables can be linked and joined together via FOREING KEY's. This allows us to access the information and sift through it within our query's. In this instance, we create a link with the job roles to the department id, a link with employee roles with the role id, and an internal link in the employee table with employee id to manager id. This essentially allows us to access the employees salary, position, and relative department
 
-### Notes route
+### Inquirer and Query Configuration
 
-The routes files provide routing methods for the get, post, and delete methods respective to the database where we store client provided information.
-
-```js
-notes.get('/', (req, res) => {
-    
-    readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)));
-});
-
-
-notes.post('/', (req, res) => {
-    console.log(`${req.method} request received to add a note`);
-
-    const { text, title } = req.body;
-
-    if (text && title) {
-        const newNote = {
-            title,
-            text,
-            id: uuidv4(),
-        };
-
-        readAndAppend(newNote, './db/db.json');
-        res.json('Note added successfully');
-    } else {
-        res.status(400).json({ error: 'Bad Request. Could not add note' });
-    
-    }
-});
-```
-
-The express routing methods for these requests follow a similar pattern to the javascript fetch methods, however instead of storing these items in local storage, we parse them and store them in the database. The functions readFromFile and readAndAppend are defined functions from the fsUtil helper extension. The readFromFile is a function that promisifies the fs.readFile function essentially making it into an asynchronous function that takes the database file path as an argument and returns the content only once it has been read. 
-
-The readAndAppend function works similarly but instead uses both the fs.writeToFile and fs.readFile methods. It reads the content of the file then parses the existing JSON data in the file, appends the new content to it, and then writes the updated JSON data back to the same file using the writeToFile function.
-
-Essentially, these methods obtain information from the database to append on the page while also allowing the user to update the database given their note includes text and title. This is all done in the notes route and exported to be used in the index-routes.
-
-
-### Index route
-
-Finally, I utilized the index route file to make the notes route applicable to the server.
+Through the use of inquirer prompts, we can direct the user to specific querries listed within functions that fullfill their requests. In this instance, I later linked these options to functions with switch cases.
 
 ```js
-const app = require('express').Router();
+const displayMenu = () => {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "choice",
+            message: "Please select an option",
+            choices: [
+                "View All Employees",
+                "Add Employee",
+                "Update Employee Role",
+                "View All Roles",
+                "Add Role",
+                "View All departments",
+                "Add Department",
+                "Remove Employee",
+                "Remove Role",
+                "Remove Department",
+                "Exit"
+            ],
 
-const noteRouter = require('./notes');
-
-app.use('/notes', noteRouter);
-
-module.exports = app;
+        }
+    ])
+...
+}
 ```
-This file serves the purpose of providing an endpoint, /api, with the value of notesRouter linking back to the exported notes route. This makes the client side get, post, and delete fetch methods applicable to the database once imported and applied to the server file. 
+
+For instance if the the user selected add Role, the following case would lead to the function addRole:
+
+```js
+case "Add Role":
+ addRole();
+```
+After initializing another inquirer prompt within the function to collect information such as the name of the role, salary, and the department it belongs to, I then passed these reponse variables to initiate a db.query. The db.query, in which db is defined as the mysql2 connection to the database, essentially allowed me to update the database given the query parameters that include MySQL syntax. 
+
+```js
+.then((response) => {
+            const { title, salary, department } = response;
+
+            const department_id = departments.findIndex((dept) => dept === department) + 1;
+
+            const addRoleQue = `
+            INSERT INTO roles (title, salary, department_id)
+            VALUES (?, ?, ?)
+            `;
+
+            db.query( addRoleQue, [title, salary, department_id], (err, results) => {
+                if (err) {
+                    console.error("Error adding the role:", err);
+                } else {
+                    console.log("Role added successfully!");
+                }
+                init();
+                displayMenu();
+            });
+
+            });     
+```
+
+The following line of code captures the user inputs from the prompts, and effectively adds the new role into the database as well as the roles array that I used to access and reference the database. The findIndex includes a '+1'
+incrementation as the id of the department stored in the database starts at 1 rather than 0 which is the case for the array index. This allowed to find the corresponding department id to the role listed by the user. 
+
+```js
+const init = () => {
+    departments = [];
+    roles = [];
+    employees = [];
+
+...
+
+    db.query("SELECT title FROM roles", (err, data) => {
+        roles = data.map((element) => element.title);
+    });
+
+...
+
+};
+```
+
+This is passed through the init function at the end of the query to map the new employee, department, or in this case, role to the array. This makes it accessible for the user with future prompts.
+
+
 
 
 ## Usage 
 
-This application can be used to plan out your day, take notes, or store information that can be deleted and saved. Through the utilization of expess routing and a JSON database, the information is stored and accessible from anywhere and on any computer. 
+This application can be used to manage employees within a company. To use simply clone or fork this repository.
+
+![Clone](./Assets/Cloning.png)
+
+After cloning down the repo, make sure to run npm install to install the necessary dependencies. Following this, you can modify the inputs of the database to your liking within the seeds.sql file. After this, run your mysql and create the database by using "source". 
+
+![Source](./Assets/schema.png)
+
+![Source](./Assets/seeds.png)
+
+Finally, you can enter your password, user, and database name and run node index.js to update the database via the prompts on you command line.
+
+![App](./Assets/Employee-Track.png)
 
         
-## Credits
-Credits to Philip Loy from the Central Tutor Center for helping with review the application and making sure I met the acceptance criteria.
-
         
 ## License 
      
